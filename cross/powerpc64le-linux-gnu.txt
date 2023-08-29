@@ -1,0 +1,15 @@
+[binaries]
+c = 'powerpc64le-linux-gnu-gcc'
+cpp = 'powerpc64le-linux-gnu-g++'
+ar = 'powerpc64le-linux-gnu-ar'
+strip = 'powerpc64le-linux-gnu-strip'
+exe_wrapper = 'qemu-ppc64le'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'ppc64'
+cpu = 'ppc64'
+endian = 'little'
+
+[built-in options]
+c_args = ['-static']
